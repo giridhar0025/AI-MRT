@@ -7,12 +7,12 @@ A zero-cost, offline AI-powered dashboard built with React 18, TypeScript, Vite 
 Requirements:
 
 - Node.js 18+
-- [pnpm](https://pnpm.io/)
+ - npm (comes with Node.js)
 - [Ollama](https://ollama.ai/) running locally
 
 ```bash
-pnpm install
-pnpm dev
+npm install
+npm run dev
 ```
 
 Pull the LLM model (default `mistral`):
@@ -44,5 +44,5 @@ Press **Ctrl+K** to open the chat panel. Examples:
 Run unit tests with Vitest:
 
 ```bash
-pnpm test
+npm test
 ```
