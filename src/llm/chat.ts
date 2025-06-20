@@ -1,36 +1,8 @@
-import { z } from 'zod'
 import { ollama } from './ollama'
 import { logger } from '../utils/logger'
+import { toolCallSchema, type ToolCall } from '../app/zodSchemas'
 
-export const toolCallSchema = z.union([
-  z.object({
-    action: z.literal('applyFilter'),
-    column: z.string(),
-    operator: z.union([z.literal('equals'), z.literal('contains')]),
-    value: z.string(),
-  }),
-  z.object({
-    action: z.literal('applySort'),
-    column: z.string(),
-    direction: z.union([z.literal('asc'), z.literal('desc')]),
-  }),
-  z.object({
-    action: z.literal('toggleColumnVisibility'),
-    column: z.string(),
-    visible: z.boolean(),
-  }),
-  z.object({
-    action: z.literal('groupBy'),
-    column: z.string(),
-  }),
-  z.object({
-    action: z.literal('summarizeSelection'),
-  }),
-])
-
-export type ToolCall = z.infer<typeof toolCallSchema>
-
-const SYSTEM_PROMPT = `You are TableGPT, a UI assistant. Given a user message, respond ONLY with a JSON describing an action.`
+const SYSTEM_PROMPT = `You are TableGPT, an assistant that controls a React-based data grid. Respond ONLY with JSON conforming to one ToolCall schema.`
 
 export async function getToolCall(message: string, context: string): Promise<ToolCall | null> {
   const prompt = `${SYSTEM_PROMPT}\nContext: ${context}\nUser: ${message}`

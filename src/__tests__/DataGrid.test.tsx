@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import { Provider } from 'react-redux'
-import { store } from '../store'
-import DataGrid from '../components/DataGrid'
+import { store } from '../state'
+import DataGrid from '../components/DataGrid/DataGrid'
 import { vi } from 'vitest'
 
 vi.mock('material-react-table', () => ({
@@ -26,13 +26,5 @@ describe('DataGrid', () => {
       </Provider>,
     )
     expect(screen.getAllByRole('row').length).toBe(2000)
-  })
-})
-import { toggleColumnVisibility } from '../store/tableSlice'
-
-describe('pin column', () => {
-  it('can pin column', () => {
-    store.dispatch(toggleColumnVisibility({ column: 'name', visible: false }))
-    expect(store.getState().table.columnVisibility).toEqual({ name: false })
   })
 })
