@@ -1,21 +1,17 @@
 import { useEffect, useState } from 'react'
 import { Drawer, IconButton, TextField, Typography, Box, Stack } from '@mui/material'
 import SendIcon from '@mui/icons-material/Send'
-import { useDispatch, useSelector } from 'react-redux'
-import { RootState } from '../store'
-import {
-  setFilters,
-  setSorting,
-  toggleColumnVisibility,
-  setGrouping,
-} from '../store/tableSlice'
-import { getToolCall } from '../llm/chat'
+import { useDispatch } from 'react-redux'
+import { getToolCall } from '../../llm/chat'
+import { useTableIntentSync } from '../../hooks/useTableIntentSync'
+import { routeToolCall } from '../../lib/intentRouter'
+import type { AppDispatch } from '../../state'
 
 export default function ChatPanel() {
   const [open, setOpen] = useState(false)
   const [input, setInput] = useState('')
-  const messages = useSelector((s: RootState) => s.table.columnFilters)
-  const dispatch = useDispatch()
+  const dispatch = useDispatch<AppDispatch>()
+  const context = useTableIntentSync()
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -28,41 +24,8 @@ export default function ChatPanel() {
   }, [])
 
   const handleSend = async () => {
-    const context = JSON.stringify({
-      filters: messages,
-    })
     const tool = await getToolCall(input, context)
-    if (!tool) return
-    switch (tool.action) {
-      case 'applyFilter':
-        dispatch(
-          setFilters([
-            {
-              id: tool.column,
-              value: tool.value,
-            },
-          ]),
-        )
-        break
-      case 'applySort':
-        dispatch(
-          setSorting([
-            {
-              id: tool.column,
-              desc: tool.direction === 'desc',
-            },
-          ]),
-        )
-        break
-      case 'toggleColumnVisibility':
-        dispatch(toggleColumnVisibility({ column: tool.column, visible: tool.visible }))
-        break
-      case 'groupBy':
-        dispatch(setGrouping([tool.column]))
-        break
-      default:
-        break
-    }
+    if (tool) routeToolCall(tool, dispatch)
     setInput('')
   }
 
